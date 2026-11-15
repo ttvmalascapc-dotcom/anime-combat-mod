@@ -115,7 +115,7 @@ final class AbilityExecutor {
     private static void dash(ServerWorld world, ServerPlayerEntity player, AbilityDef a) {
         Vec3d look = player.getRotationVec(1.0F).normalize();
         player.setVelocity(look.x * a.power(), Math.max(look.y * a.power() * 0.5, 0.15), look.z * a.power());
-        player.velocityModified = true;
+        player.networkHandler.sendPacket(new net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket(player));
         Vec3d p = player.getEntityPos();
         world.spawnParticles(particle(a.vfx()), p.x, p.y + 0.5, p.z, 12, 0.3, 0.3, 0.3, 0.02);
     }
