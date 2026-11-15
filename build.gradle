@@ -1,0 +1,60 @@
+plugins {
+    id 'fabric-loom' version "${loom_version}"
+}
+
+def requireProp = { String name ->
+    if (!project.hasProperty(name)) {
+        throw new GradleException("Missing gradle property '${name}'. The GitHub Actions workflow resolves it automatically.")
+    }
+    return project.property(name)
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${requireProp('yarn_mappings')}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${requireProp('loader_version')}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${requireProp('fabric_api_version')}"
+}
+
+processResources {
+    inputs.property "version", project.version
+    filesMatching("fabric.mod.json") {
+        expand "version": inputs.properties.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 21
+    options.encoding = 'UTF-8'
+}
+
+java {
+    withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+// Tests for the Minecraft-independent core (com.animecombat.core). Plain Java, no test framework needed.
+sourceSets {
+    coreTest {
+        java.srcDir 'src/coretest/java'
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+tasks.register('coreTest', JavaExec) {
+    group = 'verification'
+    description = 'Runs the core logic tests'
+    classpath = sourceSets.coreTest.runtimeClasspath
+    mainClass = 'com.animecombat.core.CoreTests'
+}
+
+tasks.named('check') { dependsOn 'coreTest' }

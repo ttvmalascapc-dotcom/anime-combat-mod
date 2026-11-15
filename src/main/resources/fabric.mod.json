@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "animecombat",
+  "version": "${version}",
+  "name": "Anime Combat",
+  "description": "Anime fighting-game combat for Minecraft: playable characters with unique abilities, energy and cooldowns.",
+  "authors": [],
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.animecombat.AnimeCombatMod"],
+    "client": ["com.animecombat.client.AnimeCombatClient"]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
